@@ -17,6 +17,6 @@
     }
   ],
   "autoload": {
-    "classmap": ["lib"]
+    "files": ["lib/SimpleEnergy/WebHDFS/HDFS.php","lib/SimpleEnergy/WebHDFS/Curl.php"]
   },
 }
