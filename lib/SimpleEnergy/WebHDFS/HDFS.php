@@ -5,9 +5,9 @@ namespace SimpleEnergy\WebHDFS;
 //use SimpleEnergy\WebHDFS\Curl as Curl;
 
 /**
- * Class WebHDFS
+ * Class HDFS
  */
-class WebHDFS
+class HDFS
 {
 
     /**
