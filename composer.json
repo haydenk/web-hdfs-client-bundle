@@ -17,6 +17,6 @@
     }
   ],
   "autoload": {
-    "psr-0": {"SimpleEnergy/WebHDFS": "lib"}
+    "psr-4": {"SimpleEnergy\\WebHDFS\\": "lib"}
   }
 }
