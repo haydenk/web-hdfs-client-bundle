@@ -1,0 +1,22 @@
+{
+  "name": "SimpleEnergy/WebHDFS",
+  "description": "This repo was forked by Jim Glenn of simpleenergy/php-WebHDFS. php-WebHDFS is a PHP Client for WebHDFS",
+  "homepage": "https://github.com/simpleenergy/php-WebHDFS",
+  "keywords": ["hadoop", "hdfs"],
+  "minimum-stability": "dev",
+  "type": "library",
+  "authors": [
+    {
+      "name": "SimpleEnergy",
+      "homepage": "http://github.com/simpleenergy"
+    },
+    {
+      "name": "Jim Glenn",
+      "email": "jimbglenn@gmail.com",
+      "homepage": "http://github.com/jimbglenn"
+    }
+  ],
+  "autoload": {
+    "classmap": ["lib"]
+  }
+}

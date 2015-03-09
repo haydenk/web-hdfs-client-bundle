@@ -2,7 +2,7 @@
 
 namespace SimpleEnergy\WebHDFS;
 
-use SimpleEnergy\WebHDFS\Curl as Curl;
+//use SimpleEnergy\WebHDFS\Curl as Curl;
 
 /**
  * Class WebHDFS
