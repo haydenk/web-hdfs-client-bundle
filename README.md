@@ -1,3 +1,16 @@
+# webHDFSClientBundle
+
+## Description
+
+I was looking for a HDFS library to use with a Symfony2 project.  php-WebHDFS seemed to be the best fit.  This bundle
+is a fork of that library from simplenergy and a re-organization, additional commenting, and minor tweaks to make
+it easier to use in Symfony2 for me.
+
+Documentation still needs to be updated to match the bundle format, but the original documentation follows.
+
+-Jim
+
+
 # php-WebHDFS
 
 ## Description
