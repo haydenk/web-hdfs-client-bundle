@@ -3,25 +3,35 @@
 namespace jimbglenn\webHDFSClientBundle\HDFS;
 
 use jimbglenn\webHDFSClientBundle\HDFS\Curl as Curl;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * Class HDFSClient
  */
-class HDFSClient
+class HDFSClient extends ContainerAware
 {
 
+    private $serverName;
+    private $port;
+    private $user;
+
     /**
-     * construct
+     * Construct
      *
-     * @param string $serverName
-     * @param string $port
-     * @param string $user
+     * @param string|null $serverName
+     * @param string|null $port
+     * @param string|null $user
      */
     public function __construct($serverName = null, $port = null, $user = null)
     {
+
         $this->serverName = $serverName;
         $this->port = $port;
         $this->user = $user;
+
+        if (!$this->isHDFSOnline()) {
+            throw new \RuntimeException("Could not connect to HDFS");
+        }
     }
 
     /**
@@ -89,6 +99,62 @@ class HDFSClient
         $redirectUrl = Curl::putLocation($url);
 
         return Curl::putFile($redirectUrl, $filename);
+    }
+
+    /**
+     * Do some basic tests to verify we are online before we loose info
+     *
+     * @return bool
+     */
+    public function isHDFSOnline()
+    {
+        if ($this->serverName === null) {
+            return false;
+        }
+        if ($this->user === null) {
+            return false;
+        }
+
+        if (! $this->ping($this->serverName)) {
+            return false;
+        }
+
+        if (! $this->verifyRootExists()) {
+            return false;
+        }
+
+            return true;
+
+    }
+
+    /**
+     * Verify the root exists (and that we can get to it)
+     *
+     * @return bool
+     */
+    private function verifyRootExists()
+    {
+        $fileStatus = json_decode($this->getFileStatus("/"), true);
+        if (!array_key_exists("FileStatus", $fileStatus)) {
+            return false;
+        } else {
+            $root = $fileStatus["FileStatus"];
+        }
+
+        return (strtolower($root["type"]) == "directory");
+    }
+
+    /**
+     * Verify we can ping a servername
+     *
+     * @param $serverName
+     * @return bool
+     */
+    private function ping($serverName)
+    {
+        exec(sprintf('ping -c 1 -W 5 %s', escapeshellarg($serverName)), $res, $rval);
+
+        return $rval === 0;
     }
 
     /**

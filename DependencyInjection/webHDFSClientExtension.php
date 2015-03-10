@@ -22,6 +22,10 @@ class webHDFSClientExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter("web_hdfs_client.serverName", $config["webHDFS"]["serverName"]);
+        $container->setParameter("web_hdfs_client.port", $config["webHDFS"]["port"]);
+        $container->setParameter("web_hdfs_client.user", $config["webHDFS"]["user"]);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

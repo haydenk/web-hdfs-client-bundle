@@ -24,6 +24,17 @@ class Configuration implements ConfigurationInterface
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
 
+        $rootNode
+            ->children()
+                ->arrayNode('webHDFS')
+                    ->children()
+                         ->scalarNode('serverName')->end()
+                         ->scalarNode('port')->end()
+                         ->scalarNode('user')->end()
+                    ->end()
+                 ->end()// webhdfs
+            ->end();
+
         return $treeBuilder;
     }
 }

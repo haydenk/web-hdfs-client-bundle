@@ -1,4 +1,4 @@
 services:
-#    web_hdfs_client.example:
-#        class: jimbglenn\webHDFSClientBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
+    web_hdfs_client:
+        class: jimbglenn\webHDFSClientBundle\HDFS\HDFSClient
+        arguments: [%web_hdfs_client.serverName%, %web_hdfs_client.port%, %web_hdfs_client.user%]
