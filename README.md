@@ -2,7 +2,7 @@
 
 ## Description
 
-webHDFSClientBundle provides a Symfony2 wrapper to the SimpleEnergy/php-WebHDFS code for interacting with HDFS from PHP.
+webHDFSClientBundle provides a Symfony2 wrapper to the [SimpleEnergy/php-WebHDFS](https://github.com/simpleenergy/php-WebHDFS) code for interacting with HDFS from PHP.
 php-WebHDFS is a PHP client for [WebHDFS](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html).
 
 
@@ -71,7 +71,7 @@ $hdfs = $this->get('web_hdfs_cilent');
 
 ## Usage
 
-- :doc:`Read the documentation`
+- [Read the documentation](Resources/doc/index.md)
 
 ### File and Directory Operations
 
