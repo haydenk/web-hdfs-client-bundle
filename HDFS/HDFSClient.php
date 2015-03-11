@@ -396,7 +396,7 @@ class HDFSClient extends ContainerAware
      */
     private function _buildUrl($path, $queryData)
     {
-        if ($path[0] == '/') {
+        if (!empty($path) && $path[0] == '/') {
             $path = substr($path, 1);
         }
 
