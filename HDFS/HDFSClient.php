@@ -135,7 +135,7 @@ class HDFSClient extends ContainerAware
     private function verifyRootExists()
     {
         $fileStatus = json_decode($this->getFileStatus("/"), true);
-        if (!array_key_exists("FileStatus", $fileStatus)) {
+        if (!is_array($fileStatus) || !array_key_exists("FileStatus", $fileStatus)) {
             return false;
         } else {
             $root = $fileStatus["FileStatus"];

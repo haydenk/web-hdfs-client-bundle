@@ -2,151 +2,83 @@
 
 ## Description
 
-I was looking for a HDFS library to use with a Symfony2 project.  php-WebHDFS seemed to be the best fit.  This bundle
-is a fork of that library from simplenergy and a re-organization, additional commenting, and minor tweaks to make
-it easier to use in Symfony2 for me.
-
-Documentation still needs to be updated to match the bundle format, but the original documentation follows.
-
--Jim
-
-
-# php-WebHDFS
-
-## Description
-
-php-WebHDFS is a PHP client for [WebHDFS](http://hadoop.apache.org/docs/r2.0.3-alpha/hadoop-project-dist/hadoop-hdfs/WebHDFS.html).
+webHDFSClientBundle provides a Symfony2 wrapper to the SimpleEnergy/php-WebHDFS code for interacting with HDFS from PHP.
+php-WebHDFS is a PHP client for [WebHDFS](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html).
 
 
 ## Dependencies
 * [PHP](http://php.net/)
 * [cURL](http://curl.haxx.se/)
+* [Hadoop 2.x] (http://hadoop.apache.org/)
+* [HDFS with Web API enabled] (http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)
+* [Symfony2](http://symfony.com/)
 
+
+## Installation
+
+Using composer
+--------------
+
+To install webHDFSClientBundle with Composer add the following to your `composer.json` file:
+
+```js
+// composer.json
+{
+    // ...
+    require: {
+        // ...
+        "jimbglenn/webHDFSClientBundle": "dev-master"
+    }
+}
+```
+
+Then, you can install with Composer's ``update`` command from your project root:
+```bash
+composer update jimbglenn/webHDFSClientBundle
+```
+
+Composer will download all the required files, and install them.  Now you update ``AppKernel.php`` file and register the
+new bundle:
+
+```php
+
+<?php
+// in AppKernel::registerBundles()
+    $bundles = array(
+        // ...
+        new jimbglenn\webHDFSClientBundle\webHDFSClientBundle(),
+        // ...
+        );
+```
+
+Setup config for your instance of Hadoop's WebHDFS api. In app/config/config.yml add the following section and
+fill in with your values:
+```
+# web hdfs client configuration for hadoop:
+web_hdfs_client:
+    webHDFS:
+        serverName: devhadoop.localdomain
+        port: 50070
+        user: hadoop
+```
+
+## Example:
+
+From within a controller, you should be able to do get access to the web_hdfs_client:
+```php
+$hdfs = $this->get('web_hdfs_cilent');
+```
 
 ## Usage
 
-* [File and Directory Operations](#file-and-directory-operations)
-  * [Create and Write to a File](#create-and-write-to-a-file)
-  * [Append to a File](#append-to-a-file)
-  * [Concat File(s)](#concat-files)
-  * [Open and Read a File](#open-and-read-a-file)
-  * [Make a Directory](#make-a-directory)
-  * [Create a Symbolic Link](#create-a-symbolic-link)
-  * [Rename a File/Directory](#rename-a-filedirectory)
-  * [Delete a File/Directory](#delete-a-filedirectory)
-  * [Status of a File/Directory](#status-of-a-filedirectory)
-  * [List a Directory](#list-a-directory)
-* [Other File System Operations](#other-file-system-operations)
-  * [Get Content Summary of a Directory](#get-content-summary-of-a-directory)
-  * [Get File Checksum](#get-file-checksum)
-  * [Get Home Directory](#get-home-directory)
-  * [Set Permission](#set-permission)
-  * [Set Owner](#set-owner)
-  * [Set Replication Factor](#set-replication-factor)
-  * [Set Access or Modification Time](#set-access-or-modification-time)
+- :doc:`Read the documentation`
 
 ### File and Directory Operations
 
 #### Create and Write to a File
 ```php
-hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
+$hdfs = $this->get('web_hdfs_client');
 $hdfs->create('user/hadoop-username/new-file.txt', 'local-file.txt');
 ```
 
-#### Append to a File
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->append('user/hadoop-username/file-to-append-to.txt', 'local-file.txt');
-```
 
-#### Concat File(s)
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->concat('user/hadoop-username/concatenated-file.txt', '/test/file1,/test/file2,/test/file3');
-```
-
-#### Open and Read a File
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->open('user/hadoop-username/file.txt');
-```
-
-#### Make a Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->mkdirs('user/hadoop-username/new/directory/structure');
-```
-
-#### Create a Symbolic Link
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->createSymLink('user/hadoop-username/file.txt', '/user/hadoop-username/symlink-to-file.txt');
-````
-
-#### Rename a File/Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->rename('user/hadoop-username/file.txt', '/user/hadoop-username/renamed-file.txt');
-````
-
-#### Delete a File/Directory
-```php
-hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->delete('user/hadoop-username/file.txt');
-```
-
-#### Status of a File/Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->getFileStatus('user/hadoop-username/file.txt');
-```
-
-#### List a Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->listStatus('user/hadoop-username/');
-```
-
-### Other File System Operations
-
-#### Get Content Summary of a Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->getContentSummary('user/hadoop-username/');
-```
-
-#### Get File Checksum
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->getFileChecksum('user/hadoop-username/file.txt');
-```
-
-#### Get Home Directory
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->getHomeDirectory();
-```
-
-#### Set Permission
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->setPermission('user/hadoop-username/file.txt', '777');
-````
-
-#### Set Owner
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->setOwner('user/hadoop-username/file.txt', 'other-user');
-````
-
-#### Set Replication Factor
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$hdfs->setReplication('user/hadoop-username/file.txt', '2');
-````
-
-#### Set Access or Modification Time
-```php
-$hdfs = new WebHDFS('mynamenode.hadoop.com', '50070', 'hadoop-username');
-$response = $hdfs->setTimes('user/hadoop-username/file.txt');
-```
