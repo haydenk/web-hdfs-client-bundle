@@ -111,6 +111,24 @@ class Curl
     }
 
     /**
+     * returns whether put was successful
+     *
+     * @param string $url
+     * @return boolean
+     */
+    public static function putWithReturnSuccess($url)
+    {
+        $options = array();
+        $options[CURLOPT_URL] = $url;
+        $options[CURLOPT_PUT] = true;
+        $options[CURLOPT_RETURNTRANSFER] = true;
+
+        $info = self::_exec($options, true);
+
+        return ('200' == $info['http_code']);
+    }
+
+    /**
      * @param string $url
      * @return mixed
      */

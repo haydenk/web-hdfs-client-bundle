@@ -179,13 +179,26 @@ class HDFSClient extends ContainerAware
      * @param string $path
      * @param string $sources
      * @return mixed
+     *
+     * We get an error from Hadoop of
+     * {"RemoteException":{"exception":"HadoopIllegalArgumentException",
+     *                      "javaClassName":"org.apache.hadoop.HadoopIllegalArgumentException",
+     *                      "message":"The last block in /user/hadoop/test/concat-file.txt is not full;
+     *                      last block size = 3276 but file block size = 134217728"}}
+     *
+     * Research shows this may come back:
+     * https://issues.apache.org/jira/browse/HDFS-6641
+     *
+     * Therefore, it does not seem like a useful function and has been commented out
      */
+    /*
     public function concat($path, $sources)
     {
         $url = $this->_buildUrl($path, array('op' => 'CONCAT', 'sources' => $sources));
 
         return Curl::post($url);
     }
+    */
 
     /**
      * Open a file
@@ -224,13 +237,26 @@ class HDFSClient extends ContainerAware
      * @param string $destination
      * @param string $createParent
      * @return mixed
+     *
+     * Symlink functionality appears to no longer work in Hadoop or WebHDFS
+     * We get an error from Hadoop of
+     * {"RemoteException":{"exception":"UnsupportedOperationException",
+     *                     "javaClassName":"java.lang.UnsupportedOperationException",
+     *                      "message":"Symlinks not supported"}}
+     *
+     * Research shows this may come back:
+     * https://issues.apache.org/jira/browse/HDFS-4933
+     *
+     * Therefore, we've commented it out but left code in case it
+     * is fixed in the future.
      */
-    public function createSymLink($path, $destination, $createParent = '')
+    /*public function createSymLink($path, $destination, $createParent = '')
     {
-        $url = $this->_buildUrl($destination, array('op' => 'CREATESYMLINK', 'destination' => $path, 'createParent' => $createParent));
+        $url = $this->_buildUrl($path, array('op' => 'CREATESYMLINK', 'destination' => $destination, 'createParent' => $createParent));
 
         return Curl::put($url);
     }
+    */
 
     /**
      * Rename a path
@@ -336,7 +362,7 @@ class HDFSClient extends ContainerAware
     {
         $url = $this->_buildUrl($path, array('op' => 'SETPERMISSION', 'permission' => $permission));
 
-        return Curl::put($url);
+        return Curl::putWithReturnSuccess($url);
     }
 
     /**
@@ -352,7 +378,7 @@ class HDFSClient extends ContainerAware
     {
         $url = $this->_buildUrl($path, array('op' => 'SETOWNER', 'owner' => $owner, 'group' => $group));
 
-        return Curl::put($url);
+        return Curl::putWithReturnSuccess($url);
     }
 
     /**
@@ -372,6 +398,7 @@ class HDFSClient extends ContainerAware
 
     /**
      * Set mofication and accesstime for a path
+     * WARNING: Access time requires additional setup in hdfs config
      *
      * @param string $path
      * @param string $modificationTime
@@ -383,7 +410,7 @@ class HDFSClient extends ContainerAware
     {
         $url = $this->_buildUrl($path, array('op' => 'SETTIMES', 'modificationtime' => $modificationTime, 'accesstime' => $accessTime));
 
-        return Curl::put($url);
+        return Curl::putWithReturnSuccess($url);
     }
 
     /**
