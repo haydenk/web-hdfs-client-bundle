@@ -86,13 +86,13 @@ class HDFSClientTest extends KernelTestCase
         $hdfs = $this->hdfs;
 
         // test
-        $result = json_decode($hdfs->create($this->remoteFile, $this->localFile), true);
+        $result = $hdfs->create($this->remoteFile, $this->localFile);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
 
         // asserts
-        $this->assertEquals($result, 1, "Could not create/write a remote file");
+        $this->assertEquals($result, true, "Could not create/write a remote file");
 
     }
 
@@ -108,7 +108,7 @@ class HDFSClientTest extends KernelTestCase
         $appendData = file_get_contents($this->localFile);
 
         // test
-        $result = json_decode($hdfs->append($this->remoteFile, $appendData), true);
+        $result = $hdfs->append($this->remoteFile, $appendData);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
@@ -143,8 +143,7 @@ class HDFSClientTest extends KernelTestCase
         $inputFileList = "/" . $this->remoteFile . ",/" .  $secondRemoteFile;
 
         // test
-        $result = json_decode($hdfs->concat($concatFile, $inputFileList), true);
-        print_r($result);
+        $result = $hdfs->concat($concatFile, $inputFileList);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
@@ -187,13 +186,13 @@ class HDFSClientTest extends KernelTestCase
         $testDir = $this->remoteDir . "/makeDirectoryTest";
 
         // test
-        $result = json_decode($hdfs->mkdirs($testDir), true);
+        $result = $hdfs->mkdirs($testDir);
 
         // cleanup
         $hdfs->delete($testDir);
 
         // asserts
-        $this->assertEquals($result["boolean"], 1, "Could not make directory");
+        $this->assertEquals($result, true, "Could not make directory");
     }
 
     /**
@@ -219,16 +218,16 @@ class HDFSClientTest extends KernelTestCase
         $desiredFilePath = "/" . $this->remoteDir . "/symLinkedFile";
 
         // test
-        $folderResult = json_decode($hdfs->createSymLink($this->remoteDir, $desiredFolderPath), true);
-        $fileResult = json_decode($hdfs->createSymLink($this->remoteFile, $desiredFilePath), true);
+        $folderResult = $hdfs->createSymLink($this->remoteDir, $desiredFolderPath);
+        $fileResult = $hdfs->createSymLink($this->remoteFile, $desiredFilePath);
 
         // cleanup
         $hdfs->delete($desiredFolderPath);
         $hdfs->delete($fileResult);
 
         // asserts
-        $this->assertEquals($folderResult["boolean"], 1, "Could not symlink directory");
-        $this->assertEquals($fileResult["boolean"], 1, "Could not symlink file");
+        $this->assertEquals($folderResult, true, "Could not symlink directory");
+        $this->assertEquals($fileResult, true, "Could not symlink file");
     }
     */
 
@@ -246,21 +245,21 @@ class HDFSClientTest extends KernelTestCase
 
 
         // test file
-        $fileResult = json_decode($hdfs->rename($this->remoteFile, "/" . $desiredFilePath), true);
+        $fileResult = $hdfs->rename($this->remoteFile, "/" . $desiredFilePath);
 
         // cleanup test file
         $hdfs->delete($desiredFilePath);
 
         // test folder
-        $folderResult = json_decode($hdfs->rename($this->remoteDir, "/" . $desiredFolderPath), true);
+        $folderResult = $hdfs->rename($this->remoteDir, "/" . $desiredFolderPath);
 
         // cleanup test folder
         $hdfs->rename($desiredFolderPath, "/" . $this->remoteDir);
 
 
         // asserts
-        $this->assertEquals($folderResult["boolean"], true, "Could not rename directory");
-        $this->assertEquals($fileResult["boolean"], true, "Could not rename file");
+        $this->assertEquals($folderResult, true, "Could not rename directory");
+        $this->assertEquals($fileResult, true, "Could not rename file");
     }
 
     /**
@@ -278,12 +277,12 @@ class HDFSClientTest extends KernelTestCase
         $hdfs->create($desiredFilePath, $this->localFile);
 
         // test
-        $folderResult = json_decode($hdfs->delete($desiredFolderPath), true);
-        $fileResult = json_decode($hdfs->delete($desiredFilePath), true);
+        $folderResult = $hdfs->delete($desiredFolderPath);
+        $fileResult = $hdfs->delete($desiredFilePath);
 
         // asserts
-        $this->assertEquals($folderResult["boolean"], 1, "Could not delete directory");
-        $this->assertEquals($fileResult["boolean"], 1, "Could not delete file");
+        $this->assertEquals($folderResult, true, "Could not delete directory");
+        $this->assertEquals($fileResult, true, "Could not delete file");
     }
 
     /**
@@ -297,13 +296,13 @@ class HDFSClientTest extends KernelTestCase
         $hdfs->create($this->remoteFile, $this->localFile);
 
         // test file
-        $fileResult = json_decode($hdfs->getFileStatus($this->remoteFile), true);
+        $fileResult = $hdfs->getFileStatus($this->remoteFile);
 
         // cleanup test file
         $hdfs->delete($this->remoteFile);
 
         // test folder
-        $folderResult = json_decode($hdfs->getFileStatus($this->remoteDir), true);
+        $folderResult = $hdfs->getFileStatus($this->remoteDir);
 
         // cleanup test folder
 
@@ -311,6 +310,34 @@ class HDFSClientTest extends KernelTestCase
         // asserts
         $this->assertEquals($folderResult["FileStatus"]["type"], "DIRECTORY", "Could not get file status for a directory");
         $this->assertEquals($fileResult["FileStatus"]["type"], "FILE", "Could not get file status for a file");
+    }
+
+    /**
+     * test whether file/directory exists
+     */
+    public function testDoesExists()
+    {
+        // setup
+        /** @var HDFSClient $hdfs */
+        $hdfs = $this->hdfs;
+        $hdfs->create($this->remoteFile, $this->localFile);
+
+        // tests
+        $fileResult = $hdfs->doesExists($this->remoteFile, "file");
+        $fileResult2 = $hdfs->doesExists($this->remoteFile);
+        $folderResult = $hdfs->doesExists($this->remoteDir, "directory");
+        $folderResult2 = $hdfs->doesExists($this->remoteDir);
+        $folderResult3 = $hdfs->doesExists($this->remoteDir . "/asdfasfd");
+
+        // cleanup test file
+        $hdfs->delete($this->remoteFile);
+
+        // asserts
+        $this->assertTrue($fileResult, "Could not get file exists for file");
+        $this->assertTrue($fileResult2, "Could not get second file exists for file");
+        $this->assertTrue($folderResult, "Could not get file exists for folder");
+        $this->assertTrue($folderResult2, "Could not get second file exists for folder");
+        $this->assertNotTrue($folderResult3, "Could not get third file exists for folder");
     }
 
     /**
@@ -324,7 +351,7 @@ class HDFSClientTest extends KernelTestCase
         $hdfs->create($this->remoteFile, $this->localFile);
 
         // test
-        $folderResult = json_decode($hdfs->listStatus($this->remoteDir), true);
+        $folderResult = $hdfs->listStatus($this->remoteDir);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
@@ -345,7 +372,7 @@ class HDFSClientTest extends KernelTestCase
         $hdfs->create($this->remoteFile, $this->localFile);
 
         // test
-        $folderResult = json_decode($hdfs->getContentSummary($this->remoteDir), true);
+        $folderResult = $hdfs->getContentSummary($this->remoteDir);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
@@ -366,10 +393,10 @@ class HDFSClientTest extends KernelTestCase
         $expected = "/user/" . $hdfs->getUser();
 
         // test
-        $result = json_decode($hdfs->getHomeDirectory(), true);
+        $result = $hdfs->getHomeDirectory();
 
         // asssert
-        $this->assertEquals($result["Path"], $expected, "Home directory did not match expected path.");
+        $this->assertEquals($result, $expected, "Home directory did not match expected path.");
     }
 
     /**
@@ -425,14 +452,14 @@ class HDFSClientTest extends KernelTestCase
         $hdfs->create($this->remoteFile, $this->localFile);
 
         // test
-        $folderResult = json_decode($hdfs->setReplication($this->remoteFile, 1), true);
+        $folderResult = $hdfs->setReplication($this->remoteFile, 1);
 
         // cleanup
         $hdfs->delete($this->remoteFile);
 
 
         // asserts
-        $this->assertEquals($folderResult["boolean"], true, "Could not set replication factor");
+        $this->assertEquals($folderResult, true, "Could not set replication factor");
     }
 
     /**

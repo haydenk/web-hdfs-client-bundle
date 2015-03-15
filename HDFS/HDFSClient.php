@@ -134,7 +134,7 @@ class HDFSClient extends ContainerAware
      */
     private function verifyRootExists()
     {
-        $fileStatus = json_decode($this->getFileStatus("/"), true);
+        $fileStatus = $this->getFileStatus("/");
         if (!is_array($fileStatus) || !array_key_exists("FileStatus", $fileStatus)) {
             return false;
         } else {
@@ -221,13 +221,14 @@ class HDFSClient extends ContainerAware
      *
      * @param string $path
      * @param string $permission
-     * @return mixed
+     * @return boolean
      */
     public function mkdirs($path, $permission = '')
     {
         $url = $this->_buildUrl($path, array('op' => 'MKDIRS', 'permission' => $permission));
+        $result = json_decode(Curl::put($url), true);
 
-        return Curl::put($url);
+        return $result["boolean"];
     }
 
     /**
@@ -263,13 +264,14 @@ class HDFSClient extends ContainerAware
      *
      * @param string $path
      * @param string $destination
-     * @return mixed
+     * @return boolean
      */
     public function rename($path, $destination)
     {
         $url = $this->_buildUrl($path, array('op' => 'RENAME', 'destination' => $destination));
+        $result = json_decode(Curl::put($url), true);
 
-        return Curl::put($url);
+        return $result["boolean"];
     }
 
     /**
@@ -277,77 +279,106 @@ class HDFSClient extends ContainerAware
      *
      * @param string $path
      * @param string $recursive
-     * @return mixed
+     * @return boolean
      */
     public function delete($path, $recursive = '')
     {
+        if ($recursive == true) {
+            $recursive = "true";
+        }
         $url = $this->_buildUrl($path, array('op' => 'DELETE', 'recursive' => $recursive));
+        $result = json_decode(Curl::delete($url), true);
 
-        return Curl::delete($url);
+        return ($result["boolean"] == 1);
     }
 
     /**
      * Get file status
      *
      * @param string $path
-     * @return mixed
+     * @return array
      */
     public function getFileStatus($path)
     {
         $url = $this->_buildUrl($path, array('op' => 'GETFILESTATUS'));
 
-        return Curl::get($url);
+        return json_decode(Curl::get($url), true);
     }
 
     /**
      * List status
      *
      * @param string $path
-     * @return mixed
+     * @return array
      */
     public function listStatus($path)
     {
         $url = $this->_buildUrl($path, array('op' => 'LISTSTATUS'));
 
-        return Curl::get($url);
+        return json_decode(Curl::get($url), true);
     }
 
     /**
      * Get content summary
      *
      * @param string $path
-     * @return mixed
+     * @return array
      */
     public function getContentSummary($path)
     {
         $url = $this->_buildUrl($path, array('op' => 'GETCONTENTSUMMARY'));
 
-        return Curl::get($url);
+        return  json_decode(Curl::get($url), true);
     }
 
     /**
      * Get file's checksum
      *
      * @param string $path
-     * @return mixed
+     * @return array
      */
     public function getFileChecksum($path)
     {
         $url = $this->_buildUrl($path, array('op' => 'GETFILECHECKSUM'));
 
-        return Curl::getWithRedirect($url);
+        return json_decode(Curl::getWithRedirect($url), true);
     }
 
     /**
      * Get home directory
      *
-     * @return mixed
+     * @return string
      */
     public function getHomeDirectory()
     {
         $url = $this->_buildUrl('', array('op' => 'GETHOMEDIRECTORY'));
+        $result =  json_decode(Curl::get($url), true);
 
-        return Curl::get($url);
+        return $result["Path"];
+    }
+
+    /**
+     * check if fille/folder exists
+     * @param string $path
+     * @param string $flag exists|file|folder
+     *
+     * @return boolean
+     */
+    public function doesExists($path, $flag = "exists")
+    {
+        $result = $this->getFileStatus($path);
+
+        if (strtolower($flag) == "file") {
+            return (array_key_exists("FileStatus", $result) && $result["FileStatus"]["type"] == "FILE");
+        } else if (strtolower($flag) == "directory") {
+            return (array_key_exists("FileStatus", $result) && $result["FileStatus"]["type"] == "DIRECTORY");
+        };
+        if ((array_key_exists("FileStatus", $result) && $result["FileStatus"]["type"] == "FILE") ||
+            (array_key_exists("FileStatus", $result) && $result["FileStatus"]["type"] == "DIRECTORY")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -356,7 +387,7 @@ class HDFSClient extends ContainerAware
      * @param string $path
      * @param string $permission
      *
-     * @return mixed
+     * @return boolean
      */
     public function setPermission($path, $permission)
     {
@@ -372,7 +403,7 @@ class HDFSClient extends ContainerAware
      * @param string $owner
      * @param string $group
      *
-     * @return mixed
+     * @return boolean
      */
     public function setOwner($path, $owner = '', $group = '')
     {
@@ -387,13 +418,14 @@ class HDFSClient extends ContainerAware
      * @param string $path
      * @param string $replication
      *
-     * @return mixed
+     * @return boolean
      */
     public function setReplication($path, $replication)
     {
         $url = $this->_buildUrl($path, array('op' => 'SETREPLICATION', 'replication' => $replication));
+        $result =  json_decode(Curl::put($url), true);
 
-        return Curl::put($url);
+        return $result["boolean"];
     }
 
     /**
@@ -404,7 +436,7 @@ class HDFSClient extends ContainerAware
      * @param string $modificationTime
      * @param string $accessTime
      *
-     * @return mixed
+     * @return boolean
      */
     public function setTimes($path, $modificationTime = '', $accessTime = '')
     {
