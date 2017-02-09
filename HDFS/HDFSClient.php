@@ -3,12 +3,11 @@
 namespace jimbglenn\webHDFSClientBundle\HDFS;
 
 use jimbglenn\webHDFSClientBundle\HDFS\Curl as Curl;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * Class HDFSClient
  */
-class HDFSClient extends ContainerAware
+class HDFSClient
 {
 
     private $serverName;
