@@ -23,14 +23,9 @@ class HDFSClient
      */
     public function __construct($serverName = null, $port = null, $user = null)
     {
-
         $this->serverName = $serverName;
         $this->port = $port;
         $this->user = $user;
-
-        if (!$this->isHDFSOnline()) {
-            throw new \RuntimeException("Could not connect to HDFS");
-        }
     }
 
     /**
